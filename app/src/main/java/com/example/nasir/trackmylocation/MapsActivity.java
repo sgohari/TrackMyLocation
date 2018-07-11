@@ -1,6 +1,7 @@
 package com.example.nasir.trackmylocation;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -10,22 +11,32 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
 
     LocationManager locationManager;
+
+    private Marker markham;
+    private Marker donMills;
+    private Marker lowrence;
+    private static final LatLng DONMILLS = new LatLng(43.739338, -79.343922);
+    private static final LatLng MARKHAM = new LatLng(43.793670, -79.238540);
+    private static final LatLng LOWRENCE = new LatLng(43.711209, -79.467598);
 
 
     @Override
@@ -36,6 +47,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -154,5 +167,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
        // LatLng sydney = new LatLng(-34, 151);
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         //
+        // Add some markers to the map, and add a data object to each marker.
+        markham =mMap.addMarker(new MarkerOptions().position(MARKHAM).title("Markham Road"));
+        markham.setTag(0);
+
+        donMills =mMap.addMarker(new MarkerOptions().position(DONMILLS).title("Don Mills Road"));
+        donMills.setTag(1);
+
+        lowrence =mMap.addMarker(new MarkerOptions().position(LOWRENCE).title("Lawrence Avenue West")
+                .snippet("Available For Booking").icon(BitmapDescriptorFactory.fromResource(R.drawable.imag)));
+        // Set a listener for marker click.
+
+       mMap.setOnMarkerClickListener(this);
+       mMap.setOnInfoWindowClickListener(this);
+
+    }
+
+    @Override
+    public boolean onMarkerClick (Marker marker) {
+
+        if (marker.getTitle().equals("Don Mills Road") )
+        {
+            startActivity(new Intent(MapsActivity.this, ViewActivity.class));
+        }
+            return false;
+    }
+
+    @Override
+    public void onInfoWindowClick (Marker marker) {
+        donMills.showInfoWindow();
+        markham.showInfoWindow();
+        lowrence.showInfoWindow();
     }
 }
